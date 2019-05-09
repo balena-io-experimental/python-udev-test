@@ -1,0 +1,18 @@
+FROM balenalib/%%BALENA_MACHINE_NAME%%-python:3.7.3-stretch-build
+
+WORKDIR /app
+
+RUN pip install requests pyserial redis pyudev pycodestyle click boto3
+
+RUN mkdir /usr/local/bin/bossac
+ADD https://github.com/shumatech/BOSSA/releases/download/1.7.0/bossac-1.7.0-arm-linux-gnueabihf.tar.gz /tmp/
+RUN tar -xvzf /tmp/bossac-1.7.0-arm-linux-gnueabihf.tar.gz -C /usr/local/bin/bossac
+RUN ln -s /usr/local/bin/bossac/bossac-1.7.0/bossac /bin/bossac
+
+# copy current directory into /app
+COPY . ./
+
+ENV UDEV=1
+
+# run python script when container lands on device
+CMD ["python", "main.py"]
